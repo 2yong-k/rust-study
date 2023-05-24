@@ -3,7 +3,7 @@
 ## 참고
 01. 만들면서 배우는 러스트 프로그래밍(https://github.com/wikibook/rust)
 02. The Rust Programming Language(https://rinthel.github.io/rust-lang-book-ko/ch00-00-introduction.html)
-03. Rust Github(https://github.com/rust-lang)
+03. The Rust Programming Language Github(https://github.com/rust-lang)
 
 ## 시작
 01. Rust 설치(https://www.rust-lang.org/tools/install)
