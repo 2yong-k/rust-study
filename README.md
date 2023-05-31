@@ -11,10 +11,10 @@
     - rustc (러스트 컴파일러)
     - rustup (러스트 설치 도구)
     - cargo (러스트 패키지 관리 도구)
-03. 유용한 도구 설치
+03. 유용한 도구 실행
     - rustfmt(코드 포맷터, 코드 스타일 교정)
     ```
-    $ rustup component add rustfmt  // 
+    $ rustup component add rustfmt
     $ cargo fmt
     $ cargo fmt --all -- --check
     ```
@@ -34,7 +34,7 @@
 05. 추가로 디버깅 모듈 설치. Microsoft C/C++, CodeLLDB: F5키를 이용해 디버깅 시작
 06. 새로운 프로젝트 생성 디폴트는 바이너리 프로젝트 / 라이브러리 프로젝트 생성 / 현재 디렉토리에 생성
     ```
-    $ cargo new PROJECT_NAME (--bin)    // 새로운 프로젝트 생성 (바이너리)
+    $ cargo new PROJECT_NAME (--bin)    // 새로운 프로젝트 생성 (디폴트 바이너리)
     $ cargo new LIBRARY_NAME --lib      // 새로운 프로젝트 생성 (라이브러리)
     $ cargo init                        // 현재 디렉토리에 새로운 프로젝트 생성
     ```
