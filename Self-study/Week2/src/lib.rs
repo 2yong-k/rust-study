@@ -7,22 +7,13 @@ use near_sdk::{
     env, near_bindgen, AccountId, Balance, CryptoHash, PanicOnDefault, Promise, PromiseOrValue,
 };
 
-use crate::internal::*;
 pub use crate::metadata::*;
 pub use crate::mint::*;
 pub use crate::nft_core::*;
-pub use crate::approval::*;
-pub use crate::royalty::*;
-pub use crate::events::*;
 
-mod internal;
-mod approval; 
-mod enumeration; 
 mod metadata; 
 mod mint; 
 mod nft_core; 
-mod royalty; 
-mod events;
 
 /// This spec can be treated like a version of the standard.
 pub const NFT_METADATA_SPEC: &str = "1.0.0";
