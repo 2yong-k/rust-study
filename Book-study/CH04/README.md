@@ -98,7 +98,7 @@
     ```
 
 03. 트레잇의 기본 메서드
-- **트레잇 선언 방법**: 기본 메서드로 사용할 함수를 트레잇에서 정의하고, 사용하려는 구조체에서는 따로 정의하지 않아도 내부적으로 들어가있다.
+- **트레잇 기본 메서드 선언 방법**: 기본 메서드로 사용할 함수를 트레잇에서 정의하고, 사용하려는 구조체에서는 따로 정의하지 않아도 내부적으로 들어가있다.
     ```
     trait TRAIT_NAME {
         fn FUNC1(&self, arg1, arg2, ...) -> RETURN_TYPE {}
@@ -261,5 +261,120 @@
     ```
 
 ## Section06. 러스트의 모듈, 크레이트, 패키지
+01. 왜 기능별로 분리해야 하는가?
+- 프로그램을 기능별로 분리하는 것이 유리하다.
+- 프로그램의 구조를 알기 쉽게 되며 해당 기능 개발에 집중하기 쉬워진다.
+- 업무 분담도 가능하며 문제가 발생했을 때 원인을 찾기도 쉬워진다.
+- 즉, 전체적인 효율을 높인다는 것.
+
+02. 패키지, 크레이트, 모듈
+- 모듈(러스트 기본 단위, 스코프 단위)> 크레이트(트리 구조로 표현되는 모듈의 모음) -> 패키지(2개 이상의 크레이트 관리) -> 패키지 관리 시스템(Cargo)
+- **모듈**: 하나의 모듈 아래에 1개 이상의 서브 모듈이 존재. 서브 모듈에도 하위 서브 모듈을 가질 수 있다. 1개의 파일에 여러 개의 모듈이 존재할 수 있다.
+    - 모듈 정의 + 서브 모듈 정의 + 내부 함수 정의 + 다른 모듈에서 또다른 모듈의 함수 사용 시, super 키워드 사용하여 상대 경로 추적 후 사용 -> **pub(lic)을 넣지 않으면 외부에서 이용 불가**
+    ```
+    mod MOD_NAME { 
+        pub mod SUBMOD1_NAME { 
+            pub fn FUNC_NAME(///) { ... }
+        }
+        pub mod SUBMOD2_NAME { 
+            pub fn FUNC_NAME(///) {
+                super::SUBMOD1_NAME::FUNC_NAME(///);
+            }    
+        }
+    }
+    ```
+    - 모듈 사용법 -> use를 이용하고, 사용하려는 곳에는 use로 정의된 곳부터 사용하면 된다.
+    ```
+    use MOD_NAME::{SUBMOD1_NAME, SUBMOD2_NAME};
+    SUBMOD1_NAME::FUNC_NAME(///);
+    SUBMOD2_NAME::FUNC_NAME(///);
+
+    use MOD_NAME::SUBMOD_NAME::FUNC_NAME;
+    FUNC_NAME(///);
+    ```
+    - 모듈을 파일로 분리하는 방법. src내부에 MOD_NAME 디렉터리를 만들고, mod.rs에 서브 모듈들을 정의한 뒤, SUBMOD_NAME.rs 파일들을 구현.
+    ```
+    $ cargo new rand -> rand 프로젝트 생성
+    $ cd rand/src -> rand의 src 폴더로 들어가기
+    $ mkdir random -> random이라는 디렉토리 생성 -> 내부에 mod.rs를 만들어야 해당하는 디렉터리를 모듈로 인식
+    $ touch random/mod.rs -> random 모듈 정의 파일 생성 -> pub mod 하위 모듈들 정의
+    $ touch random/linear.rs -> random::linear 모듈 생성
+    $ touch random/xorshift.rs -> random::xorshift 모듈 생성
+
+    // main.rs에서 사용
+    mod random;
+    use crate::random::{linear, xorshift};
+    ```
+    - 상대 경로로 모듈을 지정하는 방법: 동일한 이름의 함수가 있을 경우, 루트 모듈부터 써내려간다.
+    ```
+    aaa::bbb::ccc::print();
+    aaa::ddd::eee::print();
+    crate::aaa::ddd::fff::print();
+    ```
+- **패키지**: 복수의 크레이트를 한데 모은 것.
+    - Cargo를 이용해 새로운 패키지 만드는 방법을 그 동안 배움.
+    - 패키지 조작 시, Cargo.toml 파일 편집 후 Cargo로 빌드 등의 명령어를 실행
+    - 복수의 크레이트를 편집 시, Cargo.toml 파일에서 "워크스페이스"를 넣어준다.
+    - **웹 백엔드 구현 시, 복수의 크레이트 구성**
+        - **api(입력)** : HTTP 서버, 사용자로부터 입력값 처리
+        - **application(처리)** : api에 전달된 매개변수를 처리해 domain으로 전달, 트랜잭션 처리
+        - **domain(구성 및 정의)** : DB에 대한 각종 트레잇과 DB 구조체 정의
+        - **infrastructure(실제 조작)** : domain에서 정의한 트레잇을 구현
+        - 전체 5개의 Cargo.toml(root, api, application, domain, infrastructure)이 존재.
+        - 루트 폴더의 코드
+        ```
+        [workspace]
+        members = [
+            "api",
+            "application",
+            "domain",
+            "infrastructure"
+        ]
+        ```
 
 ## Section07. 직접 만든 크레이트 공개하기
+01. crates.io에 크레이트 등록
+- 계정을 생성하고 공개용 메타 정보를 추가한 뒤, Cargo 명령을 실행하면 바로 등록
+
+02. RPN(Reverse Polish Notation - 역 폴란드 표기법)이란?
+- 수식을 작성할 때, 연산자를 가장 뒤에 쓴느 표기법
+
+03. RPN 계산기 만들기
+- 스택 구조를 이용해 간단하게 구현 가능
+- 구조
+    1. RPN 계산식을 공백으로 잘라 배열로 처리
+    2. 배열에서 값을 1개씩 읽음. 더 이상 읽을 데이터가 없으면 5번째로 이동
+    3. 2번째의 값이 '숫자'라면 스택에 숫자 값을 쌓고 2번째로 돌아감
+    4. 2번째의 값이 '연산자'라면 스택에서 2개의 값을 꺼내와 연산하고 결과를 스택에 추가한 뒤 2번째로 돌아감.
+    5. 스택에서 1개의 값을 꺼내와서 출력
+
+04. crates.io에 크레이트 공개하기
+- 공개 순서
+    1. 크레이트 구현
+        - 엔트리 포인트를 포함하는 바이너리 크레이트(main.rs)와 라이브러리로 사용하는 라이브러리 크레이트(lib.rs) 2종류가 존재.
+        - cargo new PROJECT_NAME (--lib)
+        - 코드를 작성 후 테스트 코드도 작성
+        - cargo test
+        - 앞부분에 '///'를 이용해 크레이트 설명 주석을 만든다.
+    2. 문서 준비
+        - Cargo 명령어를 이용해 문서를 준비한다.
+        - cargo doc
+        - PROJECT_NAME/target/doc/CRATE_NAME에 html 형태로 저장
+        - index.html 파일을 브라우저에서 연다.(VScode extension인 'open in browser' 설치 후 alt+B)
+        - 띄워진 브라우저에서 함수 확인.
+    3. crates.io 로그인(Github 계정 필요)
+        - crates.io 접속 후 상단의 Menu -> Login with Github
+        - 이메일 인증 필요
+        - My Profile -> Account Settings -> API Tokens -> New API Token -> Create
+        - 발급된 token 복사 후 로그인
+        - cargo login API_TOKEN
+    4. Cargo.toml에 메타데이터 기입
+        - 먼저 고유한 name을 작성
+        - version도 바꾸기
+        - 추가로 authors, description, license 작성
+    5. cargo publish 명령으로 공개
+        - 에러가 발생하지 않으면 성공
+        - git 사용 시 commit 해야할 수 있음.
+    6. 공개된 크레이트 사용
+        - 새로운 프로젝트 Cargo.toml [dependencies]에 크레이트와 버전 지정.
+        - 프로젝트에서 use를 이용해 사용.
